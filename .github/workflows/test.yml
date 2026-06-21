@@ -1,4 +1,4 @@
-- name: Run Test Cases
+name: Run Test Cases
   run: |
     set -e
 
