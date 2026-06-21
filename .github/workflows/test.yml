@@ -1,30 +1,23 @@
-name: Test C Program
+- name: Run Test Cases
+  run: |
+    set -e
 
-on:
-  push:
-  pull_request:
+    for file in tests/input*.txt; do
+      num=$(basename "$file" .txt | sed 's/input//')
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
+      ./main < "$file" > actual.txt
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      # remove Windows line endings
+      tr -d '\r' < actual.txt > a.txt
+      tr -d '\r' < "tests/expected${num}.txt" > e.txt
 
-      - name: Compile Program
-        run: gcc main.c -o main
+      echo "Running test $num"
 
-      - name: Run Test Cases
-        run: |
-          for file in tests/input*.txt; do
-            num=$(basename "$file" .txt | sed 's/input//')
+      echo "Actual:"
+      cat -A a.txt
 
-            ./main < "$file" > actual.txt
+      echo "Expected:"
+      cat -A e.txt
 
-            # normalize line endings + ignore newline issues
-            tr -d '\r' < actual.txt > a.txt
-            tr -d '\r' < tests/expected${num}.txt > e.txt
-
-           diff -ZB a.txt e.txt
-          done
+      diff -u a.txt e.txt
+    done
