@@ -22,7 +22,9 @@ jobs:
 
             ./main < "$file" > actual.txt
 
-            diff actual.txt tests/expected${num}.txt
+            # normalize line endings + ignore newline issues
+            tr -d '\r' < actual.txt > a.txt
+            tr -d '\r' < tests/expected${num}.txt > e.txt
 
-            echo "Test $num Passed"
+           diff -ZB a.txt e.txt
           done
