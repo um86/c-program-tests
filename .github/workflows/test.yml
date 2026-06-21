@@ -1,0 +1,28 @@
+name: Test C Program
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Compile Program
+        run: gcc main.c -o main
+
+      - name: Run Test Cases
+        run: |
+          for file in tests/input*.txt; do
+            num=$(basename "$file" .txt | sed 's/input//')
+
+            ./main < "$file" > actual.txt
+
+            diff actual.txt tests/expected${num}.txt
+
+            echo "Test $num Passed"
+          done
